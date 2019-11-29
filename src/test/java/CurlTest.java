@@ -5,21 +5,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CurlTest {
+
     public static void main(String[] args) {
         System.out.println("□ □ □ □ □ 結果 □ □ □ □ □");
         System.out.println(TrimString(Get()));
-        //SaveFile(TrimString(Get()));
+        //OutputFile(TrimString(Get()));
     }
+
     // Getメソッド
     public static String Get(){
         String urlText = "https://example.com"; // 本来はコンソールから読み込む
         HttpURLConnection httpURLConnection = null;
-        InputStream inputStream = null; // 結果（バイト）を格納する変数
+        InputStream inputResultText = null; // 結果（バイト）を格納する変数
         BufferedReader bufferedReader = null; // 結果を読み込み格納する
 
         try {
             // try:必ず実行する処理
-
             URL url = new URL(urlText); // 接続するURLを指定しインスタンス生成
             // コネクションを取得（URLが参照するリモート・オブジェクトへの接続を表すインスタンスを取得）
             httpURLConnection = (HttpURLConnection)url.openConnection();
@@ -28,16 +29,16 @@ public class CurlTest {
 
             // 応答されたコードがHTTP_OK(200)なら結果を読み込む
             if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
-                inputStream = httpURLConnection.getInputStream(); // ストリームを取得
-                bufferedReader = new BufferedReader(new InputStreamReader(inputStream)); // ストリームから文字列読み取り
-                StringBuilder output = new StringBuilder(); // 結果を格納する
+                inputResultText = httpURLConnection.getInputStream(); // ストリームを取得
+                bufferedReader = new BufferedReader(new InputStreamReader(inputResultText)); // ストリームから文字列読み取り
+                StringBuilder outputResultText = new StringBuilder(); // 結果を格納する
                 String resultText; // readLine()の際に格納する
 
                 // ストリングビルダーに最後の文字まで格納する
                 while ((resultText = bufferedReader.readLine()) != null){
-                    output.append(resultText);
+                    outputResultText.append(resultText);
                 }
-                return output.toString();
+                return outputResultText.toString();
             }
         } catch (IOException e){
             // catch:例外処理
@@ -59,71 +60,50 @@ public class CurlTest {
     }
 
     // 文字列整形メソッド
-    public static String TrimString(String s)
+    // 改行したいkeyを選択し、改行メソッドを実行
+    // 整形した文字列をStringで返す
+    public static String TrimString(String resultText)
     {
-        StringBuilder stringBuilder = new StringBuilder(s);
-        List<Integer> numList = new ArrayList<>();
-        List<Integer> conmaList = new ArrayList<>();
-        List<Integer> kakkoList = new ArrayList<>();
-        List<Integer> kakkoList2 = new ArrayList<>();
-        int insertCount = 0;
+        StringBuilder trimedResultText = new StringBuilder(resultText);
 
-        for(int i=0;i<stringBuilder.length();i++){
-            if (stringBuilder.charAt(i) == '>') {
-                numList.add(i);
+        InsertNewLine(trimedResultText,'>');
+        InsertNewLine(trimedResultText,';');
+        InsertNewLine(trimedResultText,'{');
+        InsertNewLine(trimedResultText,'}');
+
+        return trimedResultText.toString();
+    }
+
+    // 改行挿入メソッド
+    // keyを選択し、発見したらそれが何番目にあるかリストに格納する
+    // keyの後に改行コードを挿入し改行する
+    private static void InsertNewLine(StringBuilder resultText,char keyOfNewLine){
+        List<Integer> indexList = new ArrayList<>(); // keyが何番目にあるか格納するリスト
+        int insertcount = 0; // 改行コードを挿入した回数
+
+        for(int i=0;i<resultText.length();i++){
+            // keyを発見するとリストに追加
+            if(resultText.charAt(i) == keyOfNewLine){
+                indexList.add(i);
             }
         }
-        for(int j=0;j < numList.size();j++){
-            stringBuilder.insert(numList.get(j)+1+insertCount,"\n");
-            insertCount++;
-        }
 
-        insertCount = 0;
-
-        for(int i=0;i<stringBuilder.length();i++){
-            if (stringBuilder.charAt(i) == ';') {
-                conmaList.add(i);
-            }
+        for (int j=0;j<indexList.size();j++){
+            // keyの後に改行コードを挿入
+            resultText.insert(indexList.get(j) + 1 + insertcount,"\n");
+            insertcount++; // 挿入回数をインクリメント
         }
-        for(int j=0;j < conmaList.size();j++){
-            stringBuilder.insert(conmaList.get(j)+1+insertCount,"\n");
-            insertCount++;
-        }
-
-        insertCount = 0;
-
-        for(int i=0;i<stringBuilder.length();i++){
-            if (stringBuilder.charAt(i) == '}') {
-                kakkoList.add(i);
-            }
-        }
-        for(int j=0;j < kakkoList.size();j++){
-            stringBuilder.insert(kakkoList.get(j)+1+insertCount,"\n");
-            insertCount++;
-        }
-
-        insertCount = 0;
-
-        for(int i=0;i<stringBuilder.length();i++){
-            if (stringBuilder.charAt(i) == '{') {
-                kakkoList2.add(i);
-            }
-        }
-        for(int j=0;j < kakkoList2.size();j++){
-            stringBuilder.insert(kakkoList2.get(j)+1+insertCount,"\n");
-            insertCount++;
-        }
-
-        return stringBuilder.toString();
     }
 
     // ファイル出力メソッド
-    public static void SaveFile(String s){
+    public static void OutPutFile(String resultText){
+
         String fileName = "file"; // 本来はコンソールから読み込む
+
         try {
             FileWriter fileWriter = new FileWriter(fileName); // fileNameの名前のファイルを作成
-            fileWriter.write(s);
-            fileWriter.close();
+            fileWriter.write(resultText); // 書き込み
+            fileWriter.close(); // ファイルを閉じる
         } catch (IOException e){
             System.out.println(e.getMessage()); // エラーメッセージを表示
         }
