@@ -1,16 +1,17 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CurlTest {
     public static void main(String[] args) {
-        Get();
+        System.out.println("□ □ □ □ □ 結果 □ □ □ □ □");
+        System.out.println(TrimString(Get()));
+        //SaveFile(TrimString(Get()));
     }
     // Getメソッド
-    public static void Get(){
+    public static String Get(){
         String urlText = "https://example.com"; // 本来はコンソールから読み込む
         HttpURLConnection httpURLConnection = null;
         InputStream inputStream = null; // 結果（バイト）を格納する変数
@@ -36,8 +37,7 @@ public class CurlTest {
                 while ((resultText = bufferedReader.readLine()) != null){
                     output.append(resultText);
                 }
-                System.out.println("□ □ □ □ □ Getした結果 □ □ □ □ □");
-                System.out.println(output.toString()); // 結果を表示
+                return output.toString();
             }
         } catch (IOException e){
             // catch:例外処理
@@ -46,7 +46,7 @@ public class CurlTest {
             // 例外してもしなくても実行される
             try {
                 if(bufferedReader != null){
-                    bufferedReader.close(); // バッファレーダーを閉じる
+                    bufferedReader.close(); // バッファリーダーを閉じる
                 }
                 if(httpURLConnection != null){
                     httpURLConnection.disconnect(); // 接続を切る
@@ -54,6 +54,78 @@ public class CurlTest {
             } catch (IOException e){
                 System.out.println(e.getMessage()); // エラーメッセージを表示
             }
+        }
+        return null;
+    }
+
+    // 文字列整形メソッド
+    public static String TrimString(String s)
+    {
+        StringBuilder stringBuilder = new StringBuilder(s);
+        List<Integer> numList = new ArrayList<>();
+        List<Integer> conmaList = new ArrayList<>();
+        List<Integer> kakkoList = new ArrayList<>();
+        List<Integer> kakkoList2 = new ArrayList<>();
+        int insertCount = 0;
+
+        for(int i=0;i<stringBuilder.length();i++){
+            if (stringBuilder.charAt(i) == '>') {
+                numList.add(i);
+            }
+        }
+        for(int j=0;j < numList.size();j++){
+            stringBuilder.insert(numList.get(j)+1+insertCount,"\n");
+            insertCount++;
+        }
+
+        insertCount = 0;
+
+        for(int i=0;i<stringBuilder.length();i++){
+            if (stringBuilder.charAt(i) == ';') {
+                conmaList.add(i);
+            }
+        }
+        for(int j=0;j < conmaList.size();j++){
+            stringBuilder.insert(conmaList.get(j)+1+insertCount,"\n");
+            insertCount++;
+        }
+
+        insertCount = 0;
+
+        for(int i=0;i<stringBuilder.length();i++){
+            if (stringBuilder.charAt(i) == '}') {
+                kakkoList.add(i);
+            }
+        }
+        for(int j=0;j < kakkoList.size();j++){
+            stringBuilder.insert(kakkoList.get(j)+1+insertCount,"\n");
+            insertCount++;
+        }
+
+        insertCount = 0;
+
+        for(int i=0;i<stringBuilder.length();i++){
+            if (stringBuilder.charAt(i) == '{') {
+                kakkoList2.add(i);
+            }
+        }
+        for(int j=0;j < kakkoList2.size();j++){
+            stringBuilder.insert(kakkoList2.get(j)+1+insertCount,"\n");
+            insertCount++;
+        }
+
+        return stringBuilder.toString();
+    }
+
+    // ファイル出力メソッド
+    public static void SaveFile(String s){
+        String fileName = "file"; // 本来はコンソールから読み込む
+        try {
+            FileWriter fileWriter = new FileWriter(fileName); // fileNameの名前のファイルを作成
+            fileWriter.write(s);
+            fileWriter.close();
+        } catch (IOException e){
+            System.out.println(e.getMessage()); // エラーメッセージを表示
         }
     }
 }
